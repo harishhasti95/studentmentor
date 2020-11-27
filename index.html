@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NodeJs Server</title>
+    <style>
+        table{
+            margin-left: 15px;
+            text-align: center;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Add Mentor</h1>
+        <hr>
+        <form onsubmit="addMentor();return false;">
+            <div class="form-group">
+                <label for="name">Enter Mentor Name</label>
+                <input type="text" class="form-control" id="name">
+            </div>
+            <div class="form-group">
+                <label for="sub">Enter Mentor Subject</label>
+                <input type="text" class="form-control" id="sub">
+            </div>
+
+            <div class="form-group">
+                <label for="ssss_name">Enter Student Name to assign</label>
+                <input type="text" class="form-control" id="ssss_name">
+            </div>
+
+
+            <button type="submit" class="btn btn-info">Submit to add mentor</button>
+        </form>
+        <br>
+        <h1>Add Student</h1>
+        <hr>
+        <form onsubmit="addStudent();return false;">
+            <div class="form-group">
+                <label for="name">Enter Student Name</label>
+                <input type="text" class="form-control" id="s_name">
+            </div>
+            <div class="form-group">
+                <label for="sub">Enter Student Subject</label>
+                <input type="text" class="form-control" id="s_sub">
+            </div>
+            <div class="form-group">
+                <label for="ment_name">Enter Mentor whom you are under</label>
+                <input type="text" class="form-control" id="ment_name">
+            </div>
+            <button type="submit" class="btn btn-info">Submit to add Student</button>
+            
+        </form>
+        <div id="table">
+            <br>
+            <div>When you enter click to see the particular table, the details can be seen below</div>
+            <div>
+                <br>
+                <button type="submit" class="btn btn-info" onclick="displayMentor()">Click to see all mentors table</button>
+                <button type="submit" class="btn btn-info" onclick="displayStudent()">Click to see all Students table</button>
+                <br>
+                </div>
+            
+            <br>
+            <br>
+            <table class = "table table-bordered" id="table_required">
+                <thead id="thead">
+                    <tr>
+                        <th scope="col" id="zero">
+                        </th>
+                        <th scope="col" id="one">
+                        </th>
+                        <th scope="col" id="two">
+                        </th>
+                        <th scope="col" id="three">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                </tbody>
+            </table>
+            <br>
+            <button type="submit" class="btn btn-info" onclick="updateMentor()">Click to update Mentor Details</button>
+            <button type="submit" class="btn btn-info" onclick="updateStudent()">Click to update Student Details</button>
+            <button type="submit" class="btn btn-info" onclick="delMentor()">Click to Delete Mentor Details</button>
+            <button type="submit" class="btn btn-info" onclick="delStudent()">Click to Delete Student Details</button>
+            <br>
+        </div>
+        <br>
+        <div id="updel"></div>
+        <br><br><br>
+    </div>
+    <script>
+        async function addMentor(){
+            let mentorData = {
+            name: document.getElementById('name').value,
+            subject: document.getElementById('sub').value,
+            students: document.getElementById('ssss_name').value
+            }
+            await fetch('http://localhost:3000/addMentor', {
+                method: 'POST',
+                body: JSON.stringify(mentorData),
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            })
+            document.getElementById('name').value='';
+            document.getElementById('sub').value='';
+            document.getElementById('ssss_name').value='';
+        }
+        async function addStudent(){
+            let studentData = {
+            name: document.getElementById('s_name').value,
+            subject: document.getElementById('s_sub').value,
+            mentorName: document.getElementById('ment_name').value
+            }
+            await fetch('http://localhost:3000/addStudent', {
+                method: 'POST',
+                body: JSON.stringify(studentData),
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            })
+            document.getElementById('s_name').value='';
+            document.getElementById('s_sub').value='';
+            document.getElementById('ment_name').value='';
+        }
+        async function displayMentor(){
+            var mentor = await fetch('http://localhost:3000/mentors');
+            var mentor_json = await mentor.json()
+            console.log(mentor_json)
+            var h_zero = document.getElementById("zero");
+            h_zero.innerHTML = "ID"
+            var h_one = document.getElementById("one");
+            h_one.innerHTML = "Mentor Name";
+            var h_two = document.getElementById("two");
+            h_two.innerHTML = "Course Title";
+            var h_three = document.getElementById("three");
+            h_three.innerHTML = "Students under";
+            var tbody = document.getElementById('tbody');
+            tbody.innerHTML = '';
+            for(let i=0;i<mentor_json.length;i++){
+                var tr = document.createElement('tr');
+                var td0 = document.createElement('td');
+                var td1 = document.createElement('td');
+                var td2 = document.createElement('td');
+                var td3 = document.createElement('td');
+                td0.innerHTML = `${mentor_json[i].id}`;
+                td1.innerHTML = `${mentor_json[i].name}`;
+                td2.innerHTML = `${mentor_json[i].subject}`;
+                td3.innerHTML = `${mentor_json[i].students}`;
+            tr.appendChild(td0);
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tbody.appendChild(tr);
+            }
+        }
+        async function displayStudent(){
+            var student = await fetch('http://localhost:3000/students');
+            var student_json = await student.json()
+            console.log(student_json)
+            var h_zero = document.getElementById("one");
+            h_zero.innerHTML = "ID";
+            var h_one = document.getElementById("one");
+            h_one.innerHTML = "Student Name";
+            var h_two = document.getElementById("two");
+            h_two.innerHTML = "Course Title";
+            var h_three = document.getElementById("three");
+            h_three.innerHTML = "Mentor Supervising";
+            var tbody = document.getElementById('tbody');
+            tbody.innerHTML = '';
+            for(let i=0;i<student_json.length;i++){
+                var tr = document.createElement('tr');
+                var td0 = document.createElement('td');
+                var td1 = document.createElement('td');
+                var td2 = document.createElement('td');
+                var td3 = document.createElement('td');
+                td0.innerHTML = `${student_json[i].id}`;
+                td1.innerHTML = `${student_json[i].name}`;
+                td2.innerHTML = `${student_json[i].subject}`;
+                td3.innerHTML = `${student_json[i].mentorName}`;
+            tr.appendChild(td0);
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tbody.appendChild(tr);
+            }
+        }
+        async function updateMentor(){
+            var mentors_len = await fetch('http://localhost:3000/metor_length');
+            var mentors_length = await mentors_len.json();
+            var mentors_leng = mentors_length.lengths;
+            var dis_div = document.getElementById("updel");
+            dis_div.innerHTML = `Enter the id of Mentor between 1 and max of ${mentors_leng}: <input 
+            type="number" id="id_to_upd" min="1" max=${mentors_leng}> &nbsp;&nbsp;<button onclick='updM()'>Submit</button>`;
+        }
+        async function delMentor(){
+            var mentors_len = await fetch('http://localhost:3000/metor_length');
+            var mentors_length = await mentors_len.json();
+            var mentors_leng = mentors_length.lengths;
+            var dis_div = document.getElementById("updel");
+            dis_div.innerHTML = `Enter the id of Mentor between 1 and max of ${mentors_leng} which is needed to be deleted: <input 
+            type="number" id="id_to_upd" min="1" max=${mentors_leng}> &nbsp;&nbsp;<button onclick='delM()'>Submit</button>`;
+        }
+        async function delM(){
+            var id = document.getElementById("id_to_upd").value-1;
+            let mentorData = {
+                id: document.getElementById("id_to_upd").value-1
+            }
+            await fetch('http://localhost:3000/delete_mentors', {
+                method: 'POST',
+                body: JSON.stringify(mentorData),
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            })
+            alert(`Deleted mentor whose id is ${id+1}`)
+            document.getElementById('updel').innerHTML='';
+        }
+
+        
+
+        async function updM(){
+                var id = document.getElementById("id_to_upd").value-1;
+                var mentor = await fetch('http://localhost:3000/mentors');
+                var mentor_json = await mentor.json()
+                mentor_json = mentor_json[id]
+                console.log(mentor_json)
+                var blah = document.createElement('div');
+                blah.innerHTML = `<br>The mentor name is ${mentor_json.name}`
+                var bla = document.createElement('div');
+                bla.innerHTML = `<br>The mentors present students are ${mentor_json.students}`
+                var input_students = document.createElement('div');
+                input_students.innerHTML = `<br>Enter the student names: <input 
+                type="text" id="a1"> &nbsp;&nbsp;<button onclick='updMe()'>Submit</button>`; 
+                var dis_div = document.getElementById("updel");
+                dis_div.appendChild(blah)
+                dis_div.appendChild(bla)
+                dis_div.appendChild(input_students)
+        }
+
+        async function updMe(){
+            var id = document.getElementById("id_to_upd").value-1;
+            var mentor = await fetch('http://localhost:3000/mentors');
+            var mentor_json = await mentor.json()
+            mentor_json = mentor_json[id];
+            let mentorData = {
+                id: document.getElementById("id_to_upd").value,
+                name: mentor_json.name,
+                subject: mentor_json.subject,
+                students: document.getElementById('a1').value
+            }
+            await fetch('http://localhost:3000/update_mentors', {
+                method: 'POST',
+                body: JSON.stringify(mentorData),
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            })
+            alert(`Updated students of the mentor whose id is ${id+1}`)
+            document.getElementById('updel').innerHTML='';
+        }
+        async function updateStudent(){
+            var stu_len = await fetch('http://localhost:3000/stu_length');
+            var stu_length = await stu_len.json();
+            var stu_leng = stu_length.lengths;
+            var dis_div = document.getElementById("updel");
+            dis_div.innerHTML = `Enter the id of Student between 1 and max of ${stu_leng}: <input 
+            type="number" id="id_to_updS" min="1" max=${stu_leng}> &nbsp;&nbsp;<button onclick='updS()'>Submit</button>`;
+        }
+        async function updS(){
+                var id = document.getElementById("id_to_updS").value-1;
+                var student = await fetch('http://localhost:3000/students');
+                var student_json = await student.json()
+                student_json = student_json[id]
+                var blah = document.createElement('div');
+                blah.innerHTML = `<br>The student name is ${student_json.name}`
+                var bla = document.createElement('div');
+                bla.innerHTML = `<br>The mentor name is ${student_json.mentorName}`
+                var input_students = document.createElement('div');
+                input_students.innerHTML = `<br>Enter the mentor name to update: <input 
+                type="text" id="a2"> &nbsp;&nbsp;<button onclick='updST()'>Submit</button>`; 
+                var dis_div = document.getElementById("updel");
+                dis_div.appendChild(blah)
+                dis_div.appendChild(bla)
+                dis_div.appendChild(input_students)
+        }
+        async function updST(){
+            var id = document.getElementById("id_to_updS").value-1;
+            var student = await fetch('http://localhost:3000/students');
+            var student_json = await student.json()
+            student_json = student_json[id]
+            let studentData = {
+                id: document.getElementById("id_to_updS").value,
+                name: student_json.name,
+                subject: student_json.subject,
+                mentorName: document.getElementById('a2').value
+            }
+            await fetch('http://localhost:3000/update_students', {
+                method: 'POST',
+                body: JSON.stringify(studentData),
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            })
+            alert(`Updated the mentor name for the student id ${id+1}`)
+            document.getElementById('updel').innerHTML='';
+        }
+        async function delStudent(){
+            var stu_len = await fetch('http://localhost:3000/stu_length');
+            var stu_length = await stu_len.json();
+            var stu_leng = stu_length.lengths;
+            var dis_div = document.getElementById("updel");
+            dis_div.innerHTML = `Enter the id of Student between 1 and max of ${stu_leng} which needs to be deleted: <input 
+            type="number" id="id_to_updS" min="1" max=${stu_leng}> &nbsp;&nbsp;<button onclick='delS()'>Submit</button>`;
+        }
+        async function delS(){
+            var id = document.getElementById("id_to_updS").value-1;
+            let mentorData = {
+                id: document.getElementById("id_to_updS").value-1
+            }
+            await fetch('http://localhost:3000/delete_students', {
+                method: 'POST',
+                body: JSON.stringify(mentorData),
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            })
+            alert(`Deleted student whose id is ${id+1}`)
+            document.getElementById('updel').innerHTML='';
+        }
+    </script>
+</body>
+</html>
